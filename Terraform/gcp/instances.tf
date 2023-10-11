@@ -1,6 +1,6 @@
 data google_compute_zones "zones" {}
 # Compute
-resource google_compute_instance "server" {
+resource google_compute_instance "server1" {
   machine_type = "n1-standard-1"
   name         = "tg-${var.environment}-machine"
   zone         = data.google_compute_zones.zones.names[0]

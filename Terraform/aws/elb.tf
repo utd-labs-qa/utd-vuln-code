@@ -1,5 +1,5 @@
 # Create a new load balancer
-resource "aws_elb" "weblb" {
+resource "aws_elb" "web_lb" {
   name = "weblb-terraform-elb"
 
   listener {

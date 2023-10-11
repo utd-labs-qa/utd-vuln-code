@@ -8,7 +8,7 @@ resource random_string "password" {
 }
 
 resource azurerm_linux_virtual_machine "linux_machine" {
-  admin_username                  = "tg-linux"
+  admin_username                  = "tg1-linux"
   admin_password                  = random_string.password.result
   location                        = var.location
   name                            = "tg-linux"
@@ -19,7 +19,7 @@ resource azurerm_linux_virtual_machine "linux_machine" {
   source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
+    sku       = "18.04-LTS"
     version   = "latest"
   }
   os_disk {

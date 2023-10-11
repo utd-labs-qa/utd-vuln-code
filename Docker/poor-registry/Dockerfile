@@ -1,6 +1,6 @@
 ## Poor Registry
 FROM registry:2
-LABEL MAINTAINER="UTD" INFO="Kubernetes"
+LABEL MAINTAINER="UTD" INFO="Kubernetes" 
 
 WORKDIR /var/custom/registry/docker/registry
 
