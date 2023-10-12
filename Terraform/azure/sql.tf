@@ -6,7 +6,7 @@ resource "azurerm_sql_firewall_rule" "example" {
   end_ip_address      = "10.0.17.62"
 }
 
-resource "azurerm_sql_server" "example" {
+resource "azurerm_sql_server" "example1" {
   name                         = "tg-sqlserver-${var.environment}${random_integer.rnd_int.result}"
   resource_group_name          = azurerm_resource_group.example.name
   location                     = azurerm_resource_group.example.location
