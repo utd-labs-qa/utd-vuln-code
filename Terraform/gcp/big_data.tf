@@ -1,5 +1,4 @@
-# SQL
-resource google_sql_database_instance "master_instance" {
+resource google_sql_database_instance "master_instance_1" {
   name             = "tg-${var.environment}-master"
   database_version = "POSTGRES_11"
   region           = var.region

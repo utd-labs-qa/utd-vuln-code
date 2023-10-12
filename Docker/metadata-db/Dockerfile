@@ -12,6 +12,6 @@ COPY main.go /main.go
 RUN apk add --no-cache curl ca-certificates
 RUN go build -o /
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["/metadata-db"]

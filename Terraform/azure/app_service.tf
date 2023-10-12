@@ -12,7 +12,7 @@ resource azurerm_app_service_plan "example" {
   }
 }
 
-resource azurerm_app_service "app-service1" {
+resource azurerm_app_service "app-service11" {
   app_service_plan_id = azurerm_app_service_plan.example.id
   location            = var.location
   name                = "tg-app-service-${var.environment}${random_integer.rnd_int.result}"
@@ -26,7 +26,7 @@ resource azurerm_app_service "app-service1" {
   }
 }
 
-resource azurerm_app_service "app-service2" {
+resource azurerm_app_service "app-service12" {
   app_service_plan_id = azurerm_app_service_plan.example.id
   location            = var.location
   name                = "tg-app-service-${var.environment}${random_integer.rnd_int.result}"

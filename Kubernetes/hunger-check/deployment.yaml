@@ -9,6 +9,8 @@ kind: Role
 metadata:
   namespace: big-monolith
   name: secret-reader
+  labels:
+    name: secret-reader  
 rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["*"] # all the resources
@@ -57,6 +59,8 @@ kind: Deployment
 metadata:
   name: hunger-check-deployment
   namespace: big-monolith
+  labels:
+    name: hunger-check
 spec:
   selector:
     matchLabels:

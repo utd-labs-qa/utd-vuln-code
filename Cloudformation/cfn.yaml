@@ -28,7 +28,7 @@ Resources:
   ####################
   ###  EC2 in VPC  ###
   ####################
-  EC2Instance:
+  EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
       AvailabilityZone: 
@@ -37,9 +37,9 @@ Resources:
         - Fn::GetAZs: ""
       InstanceType: t2.nano
       SecurityGroupIds: 
-        - !Ref WebNodeSG
+        - !Ref WebNodeSG1
       ImageId: !Ref LatestAmiId
-      SubnetId: !Ref WebSubnet
+      SubnetId: !Ref WBSubnet
       Tags: 
         - Key: Name
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-ec2" 
@@ -55,7 +55,7 @@ Resources:
           export AWS_DEFAULT_REGION=us-west-2
           echo "<h1>Deployed via CloudFormation</h1>" | sudo tee /var/www/html/index.html
     
-  WebHostStorage:
+  WebHostStorage1:
     # Unencrypted Volume 
     Type: AWS::EC2::Volume
     Properties: 
@@ -69,20 +69,20 @@ Resources:
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-ebs"
 
   ### CFN Does not Support Volume Snapshot
-  EBSAttachment:
+  EBSAttachment1:
     Type: AWS::EC2::VolumeAttachment
     Properties:
-      InstanceId: !Ref EC2Instance
-      VolumeId: !Ref WebHostStorage
+      InstanceId: !Ref EC2Instance1
+      VolumeId: !Ref WebHostStorage1
       Device: /dev/sdh
   
   # Security Group  SSH port open to the world 
-  WebNodeSG:
+  WebNodeSG1:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-sg"
       GroupDescription: !Sub "${AWS::AccountId}-${CompanyName}-${Environment} Security Group"
-      VpcId: !Ref WebVPC
+      VpcId: !Ref WebVPC1
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
@@ -97,7 +97,7 @@ Resources:
         ToPort: 0
         CidrIp: 0.0.0.0/0
   # VPC
-  WebVPC:
+  WebVPC1:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 172.16.0.0/16
@@ -107,10 +107,10 @@ Resources:
         - Key: Name
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-vpc"
 
-  WebSubnet: 
+  WBSubnet: 
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref WebVPC
+      VpcId: !Ref WebVPC1
       CidrBlock: 172.16.10.0/24
       AvailabilityZone: !Select
         - 0
@@ -120,10 +120,10 @@ Resources:
         - Key: Name
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-subnet"
 
-  WebSubnet2:
+  WBSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref WebVPC
+      VpcId: !Ref WebVPC1
       CidrBlock: 172.16.11.0/24
       AvailabilityZone: !Select
         - 1
@@ -144,12 +144,12 @@ Resources:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       InternetGatewayId: !Ref WebIGW
-      VpcId: !Ref WebVPC
+      VpcId: !Ref WebVPC1
 
   WebRTB:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref WebVPC
+      VpcId: !Ref WebVPC1
       Tags:
         - Key: Name
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-rtb"
@@ -165,20 +165,20 @@ Resources:
   RTBAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref WebSubnet
+      SubnetId: !Ref WBSubnet
       RouteTableId: !Ref WebRTB
 
   RTBAssoc2:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref WebSubnet2
+      SubnetId: !Ref WBSubnet2
       RouteTableId: !Ref WebRTB
 
   WebENI:
     Type: AWS::EC2::NetworkInterface
     Properties:
       Description: A nice description.
-      SubnetId: !Ref WebSubnet
+      SubnetId: !Ref WBSubnet
       PrivateIpAddress: 172.16.10.100
       Tags:
         - Key: Name
@@ -187,7 +187,7 @@ Resources:
   VpcFlowLogs:
     Type: AWS::EC2::FlowLog
     Properties:
-      ResourceId: !Ref WebVPC
+      ResourceId: !Ref WebVPC1
       ResourceType: VPC
       LogDestination: !GetAtt FlowBucket.Arn
       LogDestinationType: s3
@@ -279,7 +279,7 @@ Resources:
       DBParameterGroupName: !Ref DefaultDBParameterGroup
       DBSubnetGroupName: !Ref DefaultSubnetGroup
       VPCSecurityGroups: 
-        - !Ref DefaultSG
+        - !Ref DefaultSG1
 
       DBInstanceIdentifier: !Sub "rds-${AWS::AccountId}-${CompanyName}-${Environment}"
       EngineVersion: 8.0
@@ -330,40 +330,40 @@ Resources:
       DBSubnetGroupName: !Sub "sg-${AWS::AccountId}-${CompanyName}-${Environment}"
       DBSubnetGroupDescription: CloudFormation DB Subnet Group
       SubnetIds: 
-        - !Ref WebSubnet
-        - !Ref WebSubnet2
+        - !Ref WBSubnet
+        - !Ref WBSubnet2
       Tags:
         - Key: Name
           Value: !Sub "sg-${AWS::AccountId}-${CompanyName}-${Environment}"
         - Key: Environment
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}"
 
-  DefaultSG:
+  DefaultSG1:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-rds-sg"
       GroupDescription: !Sub "${AWS::AccountId}-${CompanyName}-${Environment} RDS Security Group"
-      VpcId: !Ref WebVPC
+      VpcId: !Ref WebVPC1
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 3306
         ToPort: 3306
-        CidrIp: !GetAtt WebVPC.CidrBlock
+        CidrIp: !GetAtt WebVPC1.CidrBlock
       Tags:
         - Key: Name
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-rds-sg"
         - Key: Environment
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}"
 
-  EC2Profile:
+  EC2Profile1:
     Type: AWS::IAM::InstanceProfile
     Properties: 
       InstanceProfileName: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-profile"
       Path: "/"
       Roles: 
-        - !Ref EC2Role
+        - !Ref EC2Role1
 
-  EC2Role: 
+  EC2Role1: 
     Type: AWS::IAM::Role
     Properties: 
       RoleName: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-role"
@@ -399,10 +399,10 @@ Resources:
               - "rds:*"
             Resource: "*"
       Roles: 
-        - !Ref EC2Role
+        - !Ref EC2Role1
 
 
-  DBAppInstance:
+  DBAppInstance1:
     # EC2 have plain text secrets in user data
     Type: AWS::EC2::Instance
     Properties:
@@ -412,10 +412,10 @@ Resources:
         - Fn::GetAZs: ""
       ImageId: !Ref LatestAmiId
       InstanceType: t2.nano
-      IamInstanceProfile: !Ref EC2Profile
+      IamInstanceProfile: !Ref EC2Profile1
       SecurityGroupIds: 
-        - !Ref WebNodeSG
-      SubnetId: !Ref WebSubnet
+        - !Ref WebNodeSG1
+      SubnetId: !Ref WBSubnet
       Tags:
         - Key: Name
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-dbapp"
@@ -540,7 +540,7 @@ Resources:
   ###  Lambda  ###
   ################
 
-  IAM4Lambda:
+  IAMForLambda:
     Type: "AWS::IAM::Role"
     Properties:
       RoleName: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-analysis-lambda"
@@ -566,7 +566,7 @@ Resources:
     Properties:
       FunctionName: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-analysis"
       Runtime: nodejs12.x
-      Role: !GetAtt IAM4Lambda.Arn
+      Role: !GetAtt IAMForLambda.Arn
       Handler: exports.test
       Code:
         ZipFile: | 
@@ -585,7 +585,7 @@ Resources:
   ###  S3  ###
   ############
 
-  DataBucket:
+  DataS3Bucket:
     # Public, not encrypted, no access logs, no versioning
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
@@ -604,7 +604,7 @@ Resources:
 
   ### TODO - Custom Upload of insecure document
 
-  FinancialsBucket:
+  FinancialsS3Bucket:
     # not encrypted, no access logs, no versioning
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
@@ -621,7 +621,7 @@ Resources:
       VersioningConfiguration:
         Status: Enabled                  
 
-  OperationsBucket:
+  OperationsS3Bucket:
     # not encrypted, no access logs
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
@@ -634,7 +634,7 @@ Resources:
         - Key: Name
           Value: !Sub "${AWS::AccountId}-${CompanyName}-${Environment}-operations"
 
-  DataScienceBucket:
+  DataScienceS3Bucket:
     # not encrypted
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
@@ -675,7 +675,7 @@ Resources:
    ########################
    ### Clean S3 Buckets ### 
    ########################
-  CleanupRole:
+  CleanupIAMRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -710,11 +710,11 @@ Resources:
 
   CleanBucketFunction:
     Type: "AWS::Lambda::Function"
-    DependsOn: CleanupRole
+    DependsOn: CleanupIAMRole
     Properties:
       Handler: index.clearS3Bucket
       Role: 
-        Fn::GetAtt: CleanupRole.Arn
+        Fn::GetAtt: CleanupIAMRole.Arn
       Runtime: nodejs12.x
       Timeout: 25
       Code: 
@@ -849,29 +849,29 @@ Resources:
       ServiceToken: !GetAtt CleanBucketFunction.Arn
       BucketName: !Ref FlowBucket
   
-  CleanDataBucketOnDelete:
-    Type: Custom::cleanupdatabucket
+  CleanDataS3BucketOnDelete:
+    Type: Custom::cleanupDataS3Bucket
     Properties:
       ServiceToken: !GetAtt CleanBucketFunction.Arn
-      BucketName: !Ref DataBucket
+      BucketName: !Ref DataS3Bucket
   
-  CleanFinancialsBucketOnDelete:
-    Type: Custom::cleanupfinancialsbucket
+  CleanFinancialsS3BucketOnDelete:
+    Type: Custom::cleanupFinancialsS3Bucket
     Properties:
       ServiceToken: !GetAtt CleanBucketFunction.Arn
-      BucketName: !Ref FinancialsBucket
+      BucketName: !Ref FinancialsS3Bucket
   
-  CleanOperationsBucketOnDelete:
-    Type: Custom::cleanupoperationsbucket
+  CleanOperationsS3BucketOnDelete:
+    Type: Custom::cleanupOperationsS3Bucket
     Properties:
       ServiceToken: !GetAtt CleanBucketFunction.Arn
-      BucketName: !Ref OperationsBucket
+      BucketName: !Ref OperationsS3Bucket
   
-  CleanDataScienceBucketOnDelete:
-    Type: Custom::cleanupdatasciencebucket
+  CleanDataScienceS3BucketOnDelete:
+    Type: Custom::cleanupDataScienceS3Bucket
     Properties:
       ServiceToken: !GetAtt CleanBucketFunction.Arn
-      BucketName: !Ref DataScienceBucket
+      BucketName: !Ref DataScienceS3Bucket
   
   CleanLogsBucketOnDelete:
     Type: Custom::cleanuplogsbucket
@@ -882,16 +882,16 @@ Resources:
 Outputs:
   EC2PublicDNS:
     Description: Web Host Public DNS Name
-    Value: !GetAtt [EC2Instance, PublicDnsName]
+    Value: !GetAtt [EC2Instance1, PublicDnsName]
   VpcId:
     Description: The ID of the VPC 
-    Value: !Ref WebVPC
+    Value: !Ref WebVPC1
   PublicSubnet:
     Description: The ID of the Public Subnet
-    Value: !Ref WebSubnet
+    Value: !Ref WBSubnet
   PublicSubnet2: 
     Description: The ID of the Public Subnet
-    Value: !Ref WebSubnet2
+    Value: !Ref WBSubnet2
 
   UserName:
     Description: The Name of the IAM User
@@ -902,7 +902,7 @@ Outputs:
 
   DBAppPublicDNS:
     Description: DB App Public DNS Name
-    Value: !GetAtt [DBAppInstance, PublicDnsName]
+    Value: !GetAtt [DBAppInstance1, PublicDnsName]
   DBEndpoint:
     Description: DB Endpoint 
     Value: !Sub ${DefaultDB.Endpoint.Address}:{DefaultDB.Endpoint.Port}

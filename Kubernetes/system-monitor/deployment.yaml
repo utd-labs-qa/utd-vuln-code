@@ -12,6 +12,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: system-monitor-deployment
+  labels:
+    name: system-monitor-deployment  
 spec:
   selector:
     matchLabels:

@@ -1,4 +1,4 @@
-resource "google_storage_bucket" "tg_website" {
+resource "google_storage_bucket" "tg_website_1" {
   name          = "terragot-${var.environment}"
   force_destroy = true
   labels = {

@@ -1,4 +1,4 @@
-resource azurerm_kubernetes_cluster "k8s_cluster" {
+resource azurerm_kubernetes_cluster "k8s_cluster_aks" {
   dns_prefix          = "tg-${var.environment}"
   location            = var.location
   name                = "tg-aks-${var.environment}"

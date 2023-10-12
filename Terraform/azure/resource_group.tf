@@ -1,4 +1,4 @@
-resource "azurerm_resource_group" "example" {
+resource "azurerm_resource_group" "example1" {
   name     = "tg-${var.environment}"
   location = var.location
   tags = {

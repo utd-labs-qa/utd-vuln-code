@@ -3,6 +3,8 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: kube-bench-node
+  labels:
+    name: kube-bench-node  
 spec:
   template:
     spec:
